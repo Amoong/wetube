@@ -2,13 +2,13 @@
   "name": "wetube",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "init.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MuYoungJeong/wetube.git"
   },
   "scripts": {
-    "dev": "nodemon --exec babel-node src/server.js"
+    "dev": "nodemon --exec babel-node src/init.js"
   },
   "author": "MuYoung Jeong",
   "license": "MIT",

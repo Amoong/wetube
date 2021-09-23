@@ -11,5 +11,14 @@ const videoSchema = new mongoose.Schema({
   },
 });
 
+// Middleware 는 model 만들기 전에 선언해야함
+videoSchema.pre("save", async function () {
+  console.log(this.hashtags);
+  this.hashtags = this.hashtags[0]
+    .split(",")
+    .map(word => (word.startsWith("#") ? word : `#${word}`));
+});
+
 const Video = mongoose.model("Video", videoSchema);
+
 export default Video;

@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import bcrypt from "bcrypt";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
+
 export const postJoin = async (req, res) => {
   const { name, username, email, password, password2, location } = req.body;
   const pageTitle = "Join";
@@ -26,14 +27,19 @@ export const postJoin = async (req, res) => {
     await User.create({ name, username, email, password, location });
     return res.redirect("/login");
   } catch (error) {
-    return res.status(400).render("join", { pageTitle: "Join", errorMessage: error._message });
+    return res
+      .status(400)
+      .render("join", { pageTitle: "Join", errorMessage: error._message });
   }
 };
-export const getLogin = (req, res) => res.render("login", { pageTitle: "Login" });
+
+export const getLogin = (req, res) =>
+  res.render("login", { pageTitle: "Login" });
+
 export const postLogin = async (req, res) => {
   const { username, password } = req.body;
   const pageTitle = "Login";
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ username, socialOnly: false });
 
   if (!user) {
     return res.status(400).render(pageTitle, {
@@ -90,20 +96,15 @@ export const finishGithubLogin = async (req, res) => {
       })
     ).json();
 
-    const emailObj = emailData.find(email => email.primary && email.verified);
+    const emailObj = emailData.find((email) => email.primary && email.verified);
     if (!emailObj) {
       return res.redirect("/login");
     }
 
-    const existingUser = await User.findOne({ email: emailObj.email });
-    if (existingUser) {
-      req.session.loggedIn = true;
-      req.session.user = existingUser;
-      return res.redirect("/");
-    } else {
-      console.log(userData);
-
-      const user = await User.create({
+    let user = await User.findOne({ email: emailObj.email });
+    if (!user) {
+      user = await User.create({
+        avatarUrl: userData.avatar_url,
         name: userData.name || "",
         username: userData.name || "",
         email: emailObj.email,
@@ -111,10 +112,11 @@ export const finishGithubLogin = async (req, res) => {
         location: userData.location || "",
         socialOnly: true,
       });
-      req.session.loggedIn = true;
-      req.session.user = user;
-      return res.redirect("/");
     }
+
+    req.session.loggedIn = true;
+    req.session.user = user;
+    return res.redirect("/");
   } else {
     return res.redirect("/login");
   }
@@ -134,6 +136,8 @@ export const startGithubLogin = (req, res) => {
 };
 
 export const edit = (req, res) => res.send("Edit User");
-export const remove = (req, res) => res.send("Remove User");
-export const logout = (req, res) => res.send("Logout");
+export const logout = (req, res) => {
+  req.session.destroy();
+  return res.redirect("/");
+};
 export const see = (req, res) => res.send("see");

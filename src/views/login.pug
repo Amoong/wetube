@@ -4,8 +4,8 @@ block content
   if errorMessage
     span=errorMessage
   form(method="POST")
-    input(placeholder="Username" name="username", type="text", required)
-    input(placeholder="Password" name="password", type="password", required)
+    input(placeholder="Username" name="username", type="text", autoComplete="username" required)
+    input(placeholder="Password" name="password", type="password", autoComplete="current-password" required)
     input(type="submit" value="Login")
     br
     a(href="/users/github/start") Continue with Github &rarr;

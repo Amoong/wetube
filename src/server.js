@@ -10,8 +10,6 @@ import { localsMiddleware } from "./middlewares";
 const app = express();
 const logger = morgan("tiny");
 
-console.log(process.cwd());
-
 app.set("view engine", "pug");
 app.set("views", process.cwd() + "/src/views");
 app.use(logger);
@@ -23,7 +21,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.DB_URL }),
-  }),
+  })
 );
 
 app.use(localsMiddleware);

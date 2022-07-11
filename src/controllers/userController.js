@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 
 export const postJoin = async (req, res) => {
-  const { name, username, email, password, password2, location } = req.body;
+  const { name, email, password, password2, location } = req.body;
   const pageTitle = "Join";
 
   if (password !== password2) {
@@ -15,16 +15,16 @@ export const postJoin = async (req, res) => {
     });
   }
 
-  const exists = await User.exists({ $or: [{ username }, { email }] });
+  const exists = await User.exists({ email });
   if (exists) {
     return res.status(400).render("join", {
       pageTitle: pageTitle,
-      errorMessage: "This email/username is already taken.",
+      errorMessage: "This email is already taken.",
     });
   }
 
   try {
-    await User.create({ name, username, email, password, location });
+    await User.create({ name, email, password, location });
     return res.redirect("/login");
   } catch (error) {
     return res
@@ -37,14 +37,14 @@ export const getLogin = (req, res) =>
   res.render("login", { pageTitle: "Login" });
 
 export const postLogin = async (req, res) => {
-  const { username, password } = req.body;
+  const { email, password } = req.body;
   const pageTitle = "Login";
-  const user = await User.findOne({ username, socialOnly: false });
+  const user = await User.findOne({ email, socialOnly: false });
 
   if (!user) {
     return res.status(400).render(pageTitle, {
       pageTitle: "Login",
-      errorMessage: "An account with this username does not exists.",
+      errorMessage: "An account with this email does not exists.",
     });
   }
 
@@ -106,7 +106,6 @@ export const finishGithubLogin = async (req, res) => {
       user = await User.create({
         avatarUrl: userData.avatar_url,
         name: userData.name || "",
-        username: userData.name || "",
         email: emailObj.email,
         password: "",
         location: userData.location || "",
@@ -139,19 +138,30 @@ export const logout = (req, res) => {
   req.session.destroy();
   return res.redirect("/");
 };
+
 export const getEdit = (req, res) => {
   return res.render("edit-profile", { pageTitle: "Edit Profile" });
 };
+
 export const postEdit = async (req, res) => {
   const {
     session: {
       user: { _id },
     },
-    body: { name, email, username, location },
+    body: { name, location },
   } = req;
 
-  await User.findByIdAndUpdate(_id, { name, email, username, location });
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    {
+      name,
+      location,
+    },
+    { new: true }
+  );
 
-  return res.render("edit-profile");
+  req.session.user = updatedUser;
+
+  return res.redirect("/users/edit");
 };
 export const see = (req, res) => res.send("see");

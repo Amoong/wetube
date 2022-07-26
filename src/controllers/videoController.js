@@ -19,6 +19,9 @@ export const watch = async (req, res) => {
 
 export const getEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
 
   const video = await Video.findById(id);
   if (!video) {
@@ -30,11 +33,18 @@ export const getEdit = async (req, res) => {
 
 export const postEdit = async (req, res) => {
   const { id } = req.params;
+  const {
+    user: { _id },
+  } = req.session;
   const { title, description, hashtags } = req.body;
   const isExist = await Video.exists({ _id: id });
 
   if (!isExist) {
     return res.render("404", { pageTitle: "Video not found." });
+  }
+
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
   }
 
   await Video.findByIdAndUpdate(id, {
@@ -79,7 +89,20 @@ export const postUpload = async (req, res) => {
 
 export const deleteVideo = async (req, res) => {
   const { id } = req.params;
-  await Video.findByIdAndDelete(id);
+  const {
+    user: { _id },
+  } = req.session;
+  const video = await Video.findById(id);
+
+  if (!video) {
+    return res.status(404).render("404", { pageTitle: "Video not found." });
+  }
+
+  if (String(video.owner) !== String(_id)) {
+    return res.status(403).redirect("/");
+  }
+
+  await Video.findByIdAndRemove(id);
   return res.redirect("/");
 };
 

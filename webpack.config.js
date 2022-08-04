@@ -18,6 +18,11 @@ module.exports = {
           },
         },
       },
+      {
+        test: /.scss$/,
+        // 역순으로 동작함 sass -> css -> styles
+        use: ["style-loader", "css-loader", "sass-loader"],
+      },
     ],
   },
 };

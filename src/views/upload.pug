@@ -1,9 +1,9 @@
 extends base.pug
 
 block content 
-  div 
-    video#preview
-    button#actionBtn Start Recording
+  div.recording-section
+    video#preview.recording-view
+    button#actionBtn.recording-button Start Recording
   if errorMessage
     span=errorMessage
   form(method="POST" enctype="multipart/form-data")

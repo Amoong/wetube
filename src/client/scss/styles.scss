@@ -38,3 +38,40 @@ main {
   margin: 0 auto;
   margin-top: 50px;
 }
+
+@keyframes messageAni {
+  0% {
+    opacity: 0;
+    transform: rotateX(-180deg);
+  }
+
+  20% {
+    opacity: 1;
+    transform: rotateX(0deg);
+  }
+
+  80% {
+    opacity: 1;
+    transform: rotateX(0deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotateX(180deg);
+  }
+}
+
+.message {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  max-width: 200px;
+  padding: 10px 20px;
+  background-color: tomato;
+  color: white;
+  border-radius: 100px;
+  transform-origin: center;
+  animation: messageAni 5s forwards;
+}

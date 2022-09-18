@@ -33,11 +33,13 @@ block content
                 textarea(cols="30", rows="10" placeholder="Write a nice comment...")
                 button Add Comment
     div.video__comments
-        ul
+        ul#comments
             each comment in video.comments.reverse()
-                li.video__comment
+                li.video__comment(data-id=comment.id)
                     i.fas.fa-comment
                     span  #{comment.text}
+                    if userId === comment.owner.toString()
+                        button ❌
 
 
 block scripts
